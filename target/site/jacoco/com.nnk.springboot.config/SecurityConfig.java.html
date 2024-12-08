@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.config;
+
+import com.nnk.springboot.services.impl.CustomUserDetailsService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+/**
+ * Classe de configuration de la sécurité Spring Security.
+ *
+ * Cette classe configure les filtres de sécurité, les gestionnaires d'authentification et les règles
+ * d'accès pour l'application web.
+ *
+ * Fonctionnalités principales :
+ * - Définir les permissions d'accès en fonction des rôles d'utilisateur.
+ * - Personnaliser la page de connexion et le gestionnaire de succès d'authentification.
+ * - Configurer le fournisseur d'authentification basé sur un service utilisateur personnalisé.
+ * - Configurer un encodeur de mots de passe pour sécuriser les mots de passe.
+ *
+ * Auteur : [Votre Nom]
+ * Version : 1.0
+ */
+@Configuration
+public class SecurityConfig {
+
+    /**
+     * Logger pour enregistrer les événements liés à la configuration de la sécurité.
+     */
+<span class="fc" id="L35">    private static final Logger logger = LogManager.getLogger(SecurityConfig.class);</span>
+
+    /**
+     * Service utilisateur personnalisé pour charger les utilisateurs.
+     */
+    private final CustomUserDetailsService customUserDetailsService;
+
+    /**
+     * Gestionnaire personnalisé pour gérer les succès d'authentification.
+     */
+    private final CustomAuthenticationSuccessHandler successHandler;
+
+    /**
+     * Constructeur pour injecter les dépendances.
+     *
+     * @param customUserDetailsService Service utilisateur personnalisé.
+     * @param successHandler           Gestionnaire personnalisé de succès d'authentification.
+     */
+<span class="fc" id="L53">    public SecurityConfig(CustomUserDetailsService customUserDetailsService, CustomAuthenticationSuccessHandler successHandler) {</span>
+<span class="fc" id="L54">        this.customUserDetailsService = customUserDetailsService;</span>
+<span class="fc" id="L55">        this.successHandler = successHandler;</span>
+<span class="fc" id="L56">    }</span>
+
+    /**
+     * Définit les règles de filtrage et les permissions d'accès pour l'application.
+     *
+     * @param http L'objet HttpSecurity pour configurer les règles de sécurité.
+     * @return La chaîne de filtres de sécurité configurée.
+     * @throws Exception Si une erreur survient lors de la configuration.
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+<span class="fc" id="L67">        http</span>
+<span class="fc" id="L68">                .authorizeHttpRequests(authorizeRequests -&gt; authorizeRequests</span>
+<span class="fc" id="L69">                        .requestMatchers(&quot;/login&quot;).permitAll()  // Autoriser l'accès public à cette route</span>
+<span class="fc" id="L70">                        .requestMatchers(&quot;/user/**&quot;).hasAuthority(&quot;ADMIN&quot;) // Pages accessibles uniquement aux administrateurs</span>
+<span class="fc" id="L71">                        .anyRequest().authenticated()  // Toutes les autres pages nécessitent une authentification</span>
+                )
+<span class="fc" id="L73">                .formLogin(formLogin -&gt; formLogin</span>
+<span class="fc" id="L74">                        .loginPage(&quot;/login&quot;) // Page de connexion personnalisée</span>
+<span class="fc" id="L75">                        .successHandler(successHandler)  // Gestionnaire personnalisé de succès</span>
+<span class="fc" id="L76">                        .permitAll()</span>
+                )
+<span class="fc" id="L78">                .logout(logout -&gt; {</span>
+<span class="fc" id="L79">                    logger.info(&quot;Configuration de la déconnexion&quot;); // Log de la déconnexion</span>
+<span class="fc" id="L80">                    logout</span>
+<span class="fc" id="L81">                            .logoutSuccessUrl(&quot;/login?logout&quot;) // Rediriger après la déconnexion</span>
+<span class="fc" id="L82">                            .invalidateHttpSession(true) // Invalider la session</span>
+<span class="fc" id="L83">                            .deleteCookies(&quot;JSESSIONID&quot;) // Supprimer le cookie de session</span>
+<span class="fc" id="L84">                            .permitAll();</span>
+<span class="fc" id="L85">                })</span>
+<span class="fc" id="L86">                .userDetailsService(customUserDetailsService); // Utiliser le service utilisateur personnalisé</span>
+
+<span class="fc" id="L88">        return http.build();</span>
+    }
+
+    /**
+     * Configure le fournisseur d'authentification avec un service utilisateur et un encodeur de mots de passe.
+     *
+     * @return Le fournisseur d'authentification configuré.
+     */
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+<span class="fc" id="L98">        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();</span>
+<span class="fc" id="L99">        authProvider.setUserDetailsService(customUserDetailsService);</span>
+<span class="fc" id="L100">        authProvider.setPasswordEncoder(passwordEncoder());</span>
+<span class="fc" id="L101">        return authProvider;</span>
+    }
+
+    /**
+     * Crée un encodeur de mots de passe pour sécuriser les mots de passe dans l'application.
+     *
+     * @return Un encodeur de mots de passe basé sur BCrypt.
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L111">        return new BCryptPasswordEncoder();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

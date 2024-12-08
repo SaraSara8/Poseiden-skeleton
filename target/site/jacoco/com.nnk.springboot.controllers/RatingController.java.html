@@ -7,73 +7,120 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-
 import java.util.List;
 
+/**
+ * Contrôleur pour la gestion des opérations sur les Ratings.
+ */
 @Controller
 public class RatingController {
+
 <span class="fc" id="L21">    private static final Logger logger = LogManager.getLogger(RatingController.class);</span>
+    private final RatingService ratingService;
 
-     RatingService ratingService;
+<span class="fc" id="L24">    public RatingController(RatingService ratingService) {</span>
+<span class="fc" id="L25">        this.ratingService = ratingService;</span>
+<span class="fc" id="L26">    }</span>
 
-<span class="fc" id="L25">    public RatingController(RatingService ratingService) {</span>
-<span class="fc" id="L26">        this.ratingService = ratingService;</span>
-<span class="fc" id="L27">    }</span>
-
+    /**
+     * Affiche la liste des Ratings.
+     *
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour afficher les Ratings.
+     */
     @RequestMapping(&quot;/rating/list&quot;)
-    public String home(Model model)
-    {
-
-<span class="nc" id="L33">        List&lt;Rating&gt; rating= ratingService.findAllRating();</span>
-
-        RatingService ratingService;
-<span class="nc" id="L36">        return &quot;rating/list&quot;;</span>
+    public String home(Model model) {
+<span class="fc" id="L36">        logger.info(&quot;Récupération de tous les Ratings.&quot;);</span>
+<span class="fc" id="L37">        List&lt;Rating&gt; ratings = ratingService.findAllRating();</span>
+<span class="fc" id="L38">        model.addAttribute(&quot;ratings&quot;, ratings);</span>
+<span class="fc" id="L39">        return &quot;rating/list&quot;;</span>
     }
 
+    /**
+     * Affiche le formulaire pour ajouter un nouveau Rating.
+     *
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour ajouter un Rating.
+     */
     @GetMapping(&quot;/rating/add&quot;)
     public String addRatingForm(Model model) {
-
-<span class="nc" id="L42">       Rating rating = new Rating ();</span>
-<span class="nc" id="L43">       model.addAttribute(&quot;rating&quot;, rating);</span>
-<span class="nc" id="L44">        return &quot;rating/add&quot;;</span>
+<span class="fc" id="L50">        logger.info(&quot;Affichage du formulaire pour ajouter un nouveau Rating.&quot;);</span>
+<span class="fc" id="L51">        model.addAttribute(&quot;rating&quot;, new Rating());</span>
+<span class="fc" id="L52">        return &quot;rating/add&quot;;</span>
     }
 
+    /**
+     * Valide et enregistre un nouveau Rating.
+     *
+     * @param rating Rating à valider et enregistrer.
+     * @param result Résultat de la validation.
+     * @param model  Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste si réussite, sinon recharge le formulaire.
+     */
     @PostMapping(&quot;/rating/validate&quot;)
     public String validate(@Valid Rating rating, BindingResult result, Model model) {
-        // TODO: check data valid and save to db, after saving return Rating list
-
-<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (result.hasErrors()) {</span>
-<span class="nc" id="L52">            return &quot;rating/add&quot;;</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L66">            logger.error(&quot;Échec de la validation pour le Rating : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L67">            return &quot;rating/add&quot;;</span>
         }
-<span class="nc" id="L54">        ratingService.insert(rating);</span>
-
-<span class="nc" id="L56">        return &quot;redirect:/rating/list&quot;;</span>
-
-
+<span class="fc" id="L69">        logger.info(&quot;Enregistrement d'un nouveau Rating : {}&quot;, rating);</span>
+<span class="fc" id="L70">        ratingService.insert(rating);</span>
+<span class="fc" id="L71">        return &quot;redirect:/rating/list&quot;;</span>
     }
+
+    /**
+     * Affiche le formulaire pour mettre à jour un Rating existant.
+     *
+     * @param id    Identifiant du Rating à mettre à jour.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour mettre à jour un Rating.
+     */
     @GetMapping(&quot;/rating/update/{id}&quot;)
     public String showUpdateForm(@PathVariable(&quot;id&quot;) Integer id, Model model) {
-        // TODO: get Rating by Id and to model then show to the form
-<span class="nc" id="L63">        return &quot;rating/update&quot;;</span>
+<span class="fc" id="L83">        logger.info(&quot;Récupération du Rating avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L84">        Rating rating = ratingService.findRating(id);</span>
+<span class="fc" id="L85">        model.addAttribute(&quot;rating&quot;, rating);</span>
+<span class="fc" id="L86">        return &quot;rating/update&quot;;</span>
     }
 
+    /**
+     * Met à jour un Rating existant.
+     *
+     * @param id      Identifiant du Rating à mettre à jour.
+     * @param rating  Données mises à jour du Rating.
+     * @param result  Résultat de la validation.
+     * @param model   Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste si réussite, sinon recharge le formulaire.
+     */
     @PostMapping(&quot;/rating/update/{id}&quot;)
-    public String updateRating(@PathVariable(&quot;id&quot;) Integer id, @Valid Rating rating,
-                             BindingResult result, Model model) {
-        // TODO: check required fields, if valid call service to update Rating and return Rating list
-<span class="nc" id="L70">        return &quot;redirect:/rating/list&quot;;</span>
+    public String updateRating(@PathVariable(&quot;id&quot;) Integer id, @Valid Rating rating, BindingResult result, Model model) {
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L101">            logger.error(&quot;Échec de la validation pour la mise à jour du Rating : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L102">            return &quot;rating/update&quot;;</span>
+        }
+<span class="fc" id="L104">        logger.info(&quot;Mise à jour du Rating avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L105">        ratingService.insert(rating);</span>
+<span class="fc" id="L106">        return &quot;redirect:/rating/list&quot;;</span>
     }
 
+    /**
+     * Supprime un Rating existant.
+     *
+     * @param id    Identifiant du Rating à supprimer.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste après suppression.
+     */
     @GetMapping(&quot;/rating/delete/{id}&quot;)
     public String deleteRating(@PathVariable(&quot;id&quot;) Integer id, Model model) {
-        // TODO: Find Rating by Id and delete the Rating, return to Rating list
-<span class="nc" id="L76">        return &quot;redirect:/rating/list&quot;;</span>
+<span class="fc" id="L118">        logger.info(&quot;Suppression du Rating avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L119">        Rating rating = ratingService.findRating(id);</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">        if (rating != null) {</span>
+<span class="fc" id="L121">            ratingService.delete(rating);</span>
+        }
+<span class="fc" id="L123">        return &quot;redirect:/rating/list&quot;;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

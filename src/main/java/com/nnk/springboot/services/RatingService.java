@@ -6,37 +6,22 @@ import com.nnk.springboot.repositories.RatingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-@Service
-public class RatingService {
 
-    private final RatingRepository ratingRepository;
+public interface RatingService {
 
 
-    public RatingService(RatingRepository ratingRepository) {
-        this.ratingRepository = ratingRepository;
-    }
+    public List<Rating> findAllRating();
 
-    public List<Rating> findAllRating(){
-
-        return ratingRepository.findAll();
-
-    }
-
-    public Rating insert(Rating rating){
-
-        return ratingRepository.save(rating);
-    }
-
-    public void delete(Rating rating){
-
-        ratingRepository.deleteById(rating.getId());
-
-    }
-
-    public Rating findRating(Integer id){
-
-        return ratingRepository.findById(id).orElse(null);
+    public Rating insert(Rating rating);
 
 
-    }
+
+    public void delete(Rating rating);
+
+
+
+    public Rating findRating(Integer id);
+
+
+    public boolean existsById(int id);
 }

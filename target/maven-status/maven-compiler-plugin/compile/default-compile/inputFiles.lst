@@ -1,6 +1,8 @@
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/Application.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/config/CustomAuthenticationSuccessHandler.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/config/SecurityConfig.java
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/controllers/BidListController.java
-/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/controllers/CurveController.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/controllers/CurvePointController.java
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/controllers/HomeController.java
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/controllers/LoginController.java
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/controllers/RatingController.java
@@ -23,4 +25,12 @@
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/CurvePointService.java
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/RatingService.java
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/RuleNameService.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/TradeService.java
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/UserService.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/impl/BidListServiceImpl.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/impl/CurvePointServiceImpl.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/impl/CustomUserDetailsService.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/impl/RatingServiceImpl.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/impl/RuleNameServiceImpl.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/impl/TradeServiceImpl.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/main/java/com/nnk/springboot/services/impl/UserServiceImpl.java

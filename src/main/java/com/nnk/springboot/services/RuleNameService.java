@@ -10,37 +10,22 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class RuleNameService {
-    private final RuleNameRepository  ruleNameRepository;
-
-    public RuleNameService(RuleNameRepository ruleNameRepository) {
-
-        this.ruleNameRepository = ruleNameRepository;
-    }
-
-    public List<RuleName> findAllRuleNames() {
-
-        return ruleNameRepository.findAll();
-    }
-
-    public RuleName insert(RuleName ruleName) {
+public interface RuleNameService {
 
 
-        return ruleNameRepository.save(ruleName);
-    }
 
-    public void delete(RuleName ruleName) {
+    public List<RuleName> findAllRuleNames() ;
 
-        ruleNameRepository.deleteById(ruleName.getId());
-
-    }
-
-    public RuleName findRating(Integer id){
-
-        return ruleNameRepository.findById(id).orElse(null);
+    public RuleName insert(RuleName ruleName) ;
 
 
-    }
+
+    public void delete(RuleName ruleName) ;
+
+
+    public RuleName findRuleName(Integer id);
+
+    public boolean existsById(int id);
 }
 
 

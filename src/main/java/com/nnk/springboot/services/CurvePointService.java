@@ -8,39 +8,19 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class CurvePointService {
 
-    private final CurvePointRepository curvePointRepository;
-
-    public CurvePointService(CurvePointRepository curvePointRepository) {
-        this.curvePointRepository = curvePointRepository;
-    }
-
-    public List<CurvePoint> findAllCurvePoints() {
-        return curvePointRepository.findAll();
-    }
+public interface CurvePointService {
 
 
-    public CurvePoint insert(CurvePoint curvePoint) {
+    public List<CurvePoint> findAllCurvePoints();
 
 
-        return curvePointRepository.save(curvePoint);
-    }
+    public CurvePoint insert(CurvePoint curvePoint) ;
 
-    public void delete(CurvePoint curvePoint){
+    public void delete(CurvePoint curvePoint);
 
-         curvePointRepository.deleteById(curvePoint.getId());
+    public CurvePoint findCurvePoint(Integer id);
 
-    }
-
-    public CurvePoint findCurvePoint(Integer id){
-
-        return curvePointRepository.findById(id).orElse(null);
-
-
-    }
-
-
+    public boolean existsById(int id);
 
 }

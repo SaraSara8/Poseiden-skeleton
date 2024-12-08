@@ -4,3 +4,9 @@
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/test/java/com/nnk/springboot/RatingTests.java
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/test/java/com/nnk/springboot/RuleTests.java
 /Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/test/java/com/nnk/springboot/TradeTests.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/test/java/com/nnk/springboot/controller/BidListControllerTests.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/test/java/com/nnk/springboot/controller/CurvePointControllerTests.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/test/java/com/nnk/springboot/controller/RatingControllerTests.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/test/java/com/nnk/springboot/controller/RuleNameControllerTests.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/test/java/com/nnk/springboot/controller/TradeControllerTests.java
+/Users/sarahaimeur/Desktop/formations/GIT/Poseiden-skeleton/src/test/java/com/nnk/springboot/controller/UserControllerTests.java

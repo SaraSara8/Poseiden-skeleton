@@ -4,12 +4,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.sql.Timestamp;
+/**
+ * Représente une entité "RuleName" dans la base de données.
+ * Cette classe contient les informations relatives aux règles de nom.
+ */
 @Data
 @Entity
 @Table(name = "rulename")
 public class RuleName {
-    // TODO: Map columns in data table RULENAME with corresponding java fields
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -20,4 +23,5 @@ public class RuleName {
     private String template;
     private String sqlStr;
     private String sqlPart;
+
 }

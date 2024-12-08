@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RuleNameServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.services.impl</a> &gt; <span class="el_source">RuleNameServiceImpl.java</span></div><h1>RuleNameServiceImpl.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.services.impl;
+
+import com.nnk.springboot.domain.RuleName;
+import com.nnk.springboot.repositories.RuleNameRepository;
+import com.nnk.springboot.services.RuleNameService;
+import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+/**
+ * Implémentation du service RuleName.
+ * Ce service permet de gérer les règles définies dans le système.
+ */
+@Service
+public class RuleNameServiceImpl implements RuleNameService {
+
+<span class="fc" id="L19">    private static final Logger logger = LoggerFactory.getLogger(RuleNameServiceImpl.class);</span>
+
+    private final RuleNameRepository ruleNameRepository;
+
+<span class="fc" id="L23">    public RuleNameServiceImpl(RuleNameRepository ruleNameRepository) {</span>
+<span class="fc" id="L24">        this.ruleNameRepository = ruleNameRepository;</span>
+<span class="fc" id="L25">    }</span>
+
+    /**
+     * Récupère toutes les règles de nom.
+     * @return la liste des règles de nom.
+     */
+    public List&lt;RuleName&gt; findAllRuleNames() {
+<span class="fc" id="L32">        logger.info(&quot;Récupération de toutes les règles de nom&quot;);</span>
+<span class="fc" id="L33">        return ruleNameRepository.findAll();</span>
+    }
+
+    /**
+     * Insère une nouvelle règle de nom.
+     * @param ruleName La règle de nom à insérer.
+     * @return La règle de nom insérée.
+     */
+    public RuleName insert(RuleName ruleName) {
+<span class="fc" id="L42">        logger.info(&quot;Insertion de la règle de nom : {}&quot;, ruleName);</span>
+<span class="fc" id="L43">        return ruleNameRepository.save(ruleName);</span>
+    }
+
+    /**
+     * Supprime une règle de nom.
+     * @param ruleName La règle de nom à supprimer.
+     */
+    public void delete(RuleName ruleName) {
+<span class="fc" id="L51">        logger.info(&quot;Suppression de la règle de nom avec l'ID : {}&quot;, ruleName.getId());</span>
+<span class="fc" id="L52">        ruleNameRepository.deleteById(ruleName.getId());</span>
+<span class="fc" id="L53">    }</span>
+
+    /**
+     * Trouve une règle de nom par son ID.
+     * @param id L'ID de la règle de nom.
+     * @return La règle de nom trouvée ou null si non trouvée.
+     */
+    public RuleName findRuleName(Integer id) {
+<span class="fc" id="L61">        logger.info(&quot;Recherche de la règle de nom avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L62">        return ruleNameRepository.findById(id).orElse(null);</span>
+    }
+
+    /**
+     * Vérifie si une règle de nom existe par son ID.
+     * @param id L'ID de la règle de nom.
+     * @return true si la règle de nom existe, false sinon.
+     */
+    @Override
+    public boolean existsById(int id) {
+<span class="fc" id="L72">        logger.info(&quot;Vérification de l'existence de la règle de nom avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L73">        return ruleNameRepository.existsById(id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

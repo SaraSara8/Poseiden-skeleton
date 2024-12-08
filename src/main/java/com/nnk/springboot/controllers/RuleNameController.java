@@ -1,6 +1,5 @@
 package com.nnk.springboot.controllers;
 
-import com.nnk.springboot.domain.CurvePoint;
 import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.services.RuleNameService;
 import org.apache.logging.log4j.LogManager;
@@ -8,80 +7,119 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-
 import java.util.List;
 
+/**
+ * Contrôleur pour la gestion des opérations sur les règles de nom (RuleName).
+ */
 @Controller
 public class RuleNameController {
 
-
-    private final RuleNameService ruleNameService;
     private static final Logger logger = LogManager.getLogger(RuleNameController.class);
+    private final RuleNameService ruleNameService;
 
     public RuleNameController(RuleNameService ruleNameService) {
-
         this.ruleNameService = ruleNameService;
     }
 
-    // TODO: Inject RuleName service
-
+    /**
+     * Affiche la liste des règles de nom.
+     *
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour afficher la liste des règles de nom.
+     */
     @RequestMapping("/ruleName/list")
-    public String home(Model model)
-    {
-
+    public String home(Model model) {
+        logger.info("Récupération de toutes les règles de nom.");
         List<RuleName> ruleNames = ruleNameService.findAllRuleNames();
-
         model.addAttribute("ruleNames", ruleNames);
-
         return "ruleName/list";
     }
 
+    /**
+     * Affiche le formulaire pour ajouter une nouvelle règle de nom.
+     *
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour ajouter une règle de nom.
+     */
     @GetMapping("/ruleName/add")
-    public String addRuleForm(Model model) {
-
-        RuleName ruleName = new RuleName();
-
-        model.addAttribute("ruleName", ruleName);
-
+    public String addRuleNameForm(Model model) {
+        logger.info("Affichage du formulaire pour ajouter une nouvelle règle de nom.");
+        model.addAttribute("ruleName", new RuleName());
         return "ruleName/add";
     }
 
+    /**
+     * Valide et enregistre une nouvelle règle de nom.
+     *
+     * @param ruleName Règle de nom à valider et enregistrer.
+     * @param result   Résultat de la validation.
+     * @param model    Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste des règles de nom si la validation réussie, sinon recharge le formulaire.
+     */
     @PostMapping("/ruleName/validate")
     public String validate(@Valid RuleName ruleName, BindingResult result, Model model) {
-        // TODO: check data valid and save to db, after saving return RuleName list
-
         if (result.hasErrors()) {
+            logger.error("Échec de la validation pour la règle de nom : {}", result.getAllErrors());
             return "ruleName/add";
         }
-
+        logger.info("Enregistrement d'une nouvelle règle de nom : {}", ruleName);
         ruleNameService.insert(ruleName);
-
         return "redirect:/ruleName/list";
     }
 
-
+    /**
+     * Affiche le formulaire pour mettre à jour une règle de nom existante.
+     *
+     * @param id    Identifiant de la règle de nom à mettre à jour.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour mettre à jour une règle de nom.
+     */
     @GetMapping("/ruleName/update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-        // TODO: get RuleName by Id and to model then show to the form
+        logger.info("Récupération de la règle de nom avec l'ID : {}", id);
+        RuleName ruleName = ruleNameService.findRuleName(id);
+        model.addAttribute("ruleName", ruleName);
         return "ruleName/update";
     }
 
+    /**
+     * Met à jour une règle de nom existante.
+     *
+     * @param id       Identifiant de la règle de nom à mettre à jour.
+     * @param ruleName Données mises à jour de la règle de nom.
+     * @param result   Résultat de la validation.
+     * @param model    Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste des règles de nom si la mise à jour réussie, sinon recharge le formulaire.
+     */
     @PostMapping("/ruleName/update/{id}")
-    public String updateRuleName(@PathVariable("id") Integer id, @Valid RuleName ruleName,
-                             BindingResult result, Model model) {
-        // TODO: check required fields, if valid call service to update RuleName and return RuleName list
+    public String updateRuleName(@PathVariable("id") Integer id, @Valid RuleName ruleName, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            logger.error("Échec de la validation pour la mise à jour de la règle de nom : {}", result.getAllErrors());
+            return "ruleName/update";
+        }
+        logger.info("Mise à jour de la règle de nom avec l'ID : {}", id);
+        ruleNameService.insert(ruleName);
         return "redirect:/ruleName/list";
     }
 
+    /**
+     * Supprime une règle de nom existante.
+     *
+     * @param id    Identifiant de la règle de nom à supprimer.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste des règles de nom après suppression.
+     */
     @GetMapping("/ruleName/delete/{id}")
     public String deleteRuleName(@PathVariable("id") Integer id, Model model) {
-        // TODO: Find RuleName by Id and delete the RuleName, return to Rule list
+        logger.info("Suppression de la règle de nom avec l'ID : {}", id);
+        RuleName ruleName = ruleNameService.findRuleName(id);
+        if (ruleName != null) {
+            ruleNameService.delete(ruleName);
+        }
         return "redirect:/ruleName/list";
     }
 }

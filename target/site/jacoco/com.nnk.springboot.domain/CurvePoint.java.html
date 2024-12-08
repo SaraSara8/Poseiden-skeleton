@@ -9,6 +9,10 @@ import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+/**
+ * Représente un point de courbe (CurvePoint) dans la base de données.
+ * Cette classe contient les informations concernant un point d'une courbe de valeur.
+ */
 @Data
 @Entity
 @Table(name = &quot;curvepoint&quot;)
@@ -30,8 +34,10 @@ public class CurvePoint {
     @Column(name = &quot;creation_date&quot;)
     private Timestamp creationDate;
 
-<span class="fc" id="L33">    public CurvePoint() {</span>
-<span class="fc" id="L34">    }</span>
-
+    /**
+     * Constructeur par défaut.
+     */
+<span class="fc" id="L40">    public CurvePoint() {</span>
+<span class="fc" id="L41">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

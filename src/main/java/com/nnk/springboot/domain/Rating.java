@@ -7,14 +7,20 @@ import java.sql.Timestamp;
 
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
+
+/**
+ * Représente une entité "Rating" dans la base de données.
+ * Cette classe contient les informations relatives aux notations des titres financiers.
+ */
 @Data
 @Entity
 @Table(name = "rating")
 public class Rating {
-    // TODO: Map columns in data table RATING with corresponding java fields
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
+
     @NotBlank(message = "Moodys rating is mandatory")
     private String moodysRating;
 
@@ -27,6 +33,9 @@ public class Rating {
     @Positive(message = "Order number must be positive")
     private Integer orderNumber;
 
+    /**
+     * Constructeur par défaut.
+     */
     public Rating() {
 
     }

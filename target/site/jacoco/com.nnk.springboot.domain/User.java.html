@@ -3,60 +3,120 @@
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+/**
+ * Représente une entité &quot;User&quot; dans la base de données.
+ * Cette classe contient les informations relatives à un utilisateur du système.
+ */
 @Data
 @Entity
 @Table(name = &quot;users&quot;)
 public class User {
+
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+
     @NotBlank(message = &quot;Username is mandatory&quot;)
     private String username;
+
     @NotBlank(message = &quot;Password is mandatory&quot;)
     private String password;
+
     @NotBlank(message = &quot;FullName is mandatory&quot;)
     private String fullname;
+
     @NotBlank(message = &quot;Role is mandatory&quot;)
     private String role;
 
+    /**
+     * Récupère l'identifiant de l'utilisateur.
+     *
+     * @return L'identifiant de l'utilisateur.
+     */
     public Integer getId() {
-<span class="nc" id="L23">        return id;</span>
+<span class="fc" id="L38">        return id;</span>
     }
 
+    /**
+     * Définit l'identifiant de l'utilisateur.
+     *
+     * @param id L'identifiant à définir.
+     */
     public void setId(Integer id) {
-<span class="nc" id="L27">        this.id = id;</span>
-<span class="nc" id="L28">    }</span>
+<span class="fc" id="L47">        this.id = id;</span>
+<span class="fc" id="L48">    }</span>
 
+    /**
+     * Récupère le nom d'utilisateur.
+     *
+     * @return Le nom d'utilisateur.
+     */
     public String getUsername() {
-<span class="nc" id="L31">        return username;</span>
+<span class="fc" id="L56">        return username;</span>
     }
 
+    /**
+     * Définit le nom d'utilisateur.
+     *
+     * @param username Le nom d'utilisateur à définir.
+     */
     public void setUsername(String username) {
-<span class="nc" id="L35">        this.username = username;</span>
-<span class="nc" id="L36">    }</span>
+<span class="fc" id="L65">        this.username = username;</span>
+<span class="fc" id="L66">    }</span>
 
+    /**
+     * Récupère le mot de passe de l'utilisateur.
+     *
+     * @return Le mot de passe de l'utilisateur.
+     */
     public String getPassword() {
-<span class="nc" id="L39">        return password;</span>
+<span class="fc" id="L74">        return password;</span>
     }
 
+    /**
+     * Définit le mot de passe de l'utilisateur.
+     *
+     * @param password Le mot de passe à définir.
+     */
     public void setPassword(String password) {
-<span class="nc" id="L43">        this.password = password;</span>
-<span class="nc" id="L44">    }</span>
+<span class="fc" id="L83">        this.password = password;</span>
+<span class="fc" id="L84">    }</span>
 
+    /**
+     * Récupère le nom complet de l'utilisateur.
+     *
+     * @return Le nom complet de l'utilisateur.
+     */
     public String getFullname() {
-<span class="nc" id="L47">        return fullname;</span>
+<span class="fc" id="L92">        return fullname;</span>
     }
 
+    /**
+     * Définit le nom complet de l'utilisateur.
+     *
+     * @param fullname Le nom complet à définir.
+     */
     public void setFullname(String fullname) {
-<span class="nc" id="L51">        this.fullname = fullname;</span>
-<span class="nc" id="L52">    }</span>
+<span class="fc" id="L101">        this.fullname = fullname;</span>
+<span class="fc" id="L102">    }</span>
 
+    /**
+     * Récupère le rôle de l'utilisateur.
+     *
+     * @return Le rôle de l'utilisateur.
+     */
     public String getRole() {
-<span class="nc" id="L55">        return role;</span>
+<span class="fc" id="L110">        return role;</span>
     }
 
+    /**
+     * Définit le rôle de l'utilisateur.
+     *
+     * @param role Le rôle à définir.
+     */
     public void setRole(String role) {
-<span class="nc" id="L59">        this.role = role;</span>
-<span class="nc" id="L60">    }</span>
+<span class="fc" id="L119">        this.role = role;</span>
+<span class="fc" id="L120">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
