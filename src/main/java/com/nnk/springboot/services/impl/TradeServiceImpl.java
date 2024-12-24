@@ -1,9 +1,12 @@
 package com.nnk.springboot.services.impl;
 
+import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.domain.Trade;
 import com.nnk.springboot.repositories.TradeRepository;
 import com.nnk.springboot.services.TradeService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,22 @@ public class TradeServiceImpl implements TradeService {
         logger.info("Récupération de toutes les transactions");
         return traderepository.findAll();
     }
+
+
+
+    /**
+     * Récupère une page paginée de soumissions.
+     *
+     * @param pageable l'objet définissant la pagination (page actuelle, taille de la page, etc.).
+     * @return une page contenant les instances de {@link Trade}.
+     */
+    @Override
+    public Page<Trade> findPaginated(Pageable pageable) {
+        logger.info("Récupération de toutes les transactions par page");
+        return traderepository.findAll(pageable);
+    }
+
+
 
     /**
      * Insère une nouvelle transaction.

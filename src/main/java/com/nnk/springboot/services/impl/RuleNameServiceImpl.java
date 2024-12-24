@@ -1,8 +1,11 @@
 package com.nnk.springboot.services.impl;
 
+import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.repositories.RuleNameRepository;
 import com.nnk.springboot.services.RuleNameService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,21 @@ public class RuleNameServiceImpl implements RuleNameService {
         logger.info("Récupération de toutes les règles de nom");
         return ruleNameRepository.findAll();
     }
+
+
+    /**
+     * Récupère une page paginée de soumissions.
+     *
+     * @param pageable l'objet définissant la pagination (page actuelle, taille de la page, etc.).
+     * @return une page contenant les instances de {@link RuleName}.
+     */
+    @Override
+    public Page<RuleName> findPaginated(Pageable pageable) {
+        logger.info("Récupération de toutes les règles de nom par page");
+        return ruleNameRepository.findAll(pageable);
+    }
+
+
 
     /**
      * Insère une nouvelle règle de nom.

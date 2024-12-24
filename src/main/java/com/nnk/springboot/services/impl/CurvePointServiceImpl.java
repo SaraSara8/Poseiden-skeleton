@@ -1,9 +1,12 @@
 package com.nnk.springboot.services.impl;
 
+import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.domain.CurvePoint;
 import com.nnk.springboot.repositories.CurvePointRepository;
 import com.nnk.springboot.services.CurvePointService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,21 @@ public class CurvePointServiceImpl implements CurvePointService {
         logger.info("Récupération de tous les points de courbe");
         return curvePointRepository.findAll();
     }
+
+
+
+    /**
+     * Récupère une page paginée de soumissions.
+     *
+     * @param pageable l'objet définissant la pagination (page actuelle, taille de la page, etc.).
+     * @return une page contenant les instances de {@link CurvePoint}.
+     */
+    @Override
+    public Page<CurvePoint> findPaginated(Pageable pageable) {
+        logger.info("Récupération de tous les points de courbe par page");
+        return curvePointRepository.findAll(pageable);
+    }
+
 
     /**
      * Insère un nouveau point de courbe.

@@ -109,40 +109,44 @@ public class BidListControllerTests {
         BidList savedBidList = bidListService.insert(testBidList);
 
         // Effectuer une requête GET sur /bidList/update/{id}
-        mockMvc.perform(get("/bidList/update/" + savedBidList.getId()))
+        mockMvc.perform(get("/bidList/update/" + savedBidList.getBidListId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("bidList/update"))
                 .andExpect(model().attributeExists("bidList"))
-                .andExpect(model().attribute("bidList", hasProperty("id", is(savedBidList.getId()))));
+                .andExpect(model().attribute("bidList", hasProperty("bidListId", is(savedBidList.getBidListId()))));
     }
 
     @Test
     @WithMockUser
     public void testUpdateBidList() throws Exception {
-        // Enregistrer un BidList pour le test
+        // Étape 1 : Créer une BidList initiale
         BidList savedBidList = bidListService.insert(testBidList);
 
-        // Effectuer une requête POST sur /bidList/update/{id} avec des données mises à jour
-        mockMvc.perform(post("/bidList/update/" + savedBidList.getId())
-                        .param("account", "Account Test3")
-                        .param("type", "type Test")
-                        .param("bidQuantity", "20.0")
-                        .with(csrf()))
-                .andExpect(status().is3xxRedirection())
+        // Étape 2 : Simuler une mise à jour via MockMvc
+        mockMvc.perform(post("/bidList/update/{id}", savedBidList.getBidListId())
+                        .param("account", "Account Test Updated") // Paramètres mis à jour
+                        .param("type", "Type Test Updated")
+                        .param("bidQuantity", "30.0")
+                        .with(csrf())) // Jeton CSRF si nécessaire
+                .andExpect(status().is3xxRedirection()) // Vérifiez la redirection
                 .andExpect(redirectedUrl("/bidList/list"));
 
-        // Vérifier que le BidList a été mis à jour
-        BidList updatedBidList = bidListService.findBidList(savedBidList.getId());
-        assertNotNull(updatedBidList);
-        assertThat(updatedBidList.getAccount(), is("Account Test3"));
+        // Étape 3 : Vérifier que la BidList a bien été mise à jour
+        BidList updatedBidList = bidListService.findBidList(savedBidList.getBidListId());
+        assertNotNull(updatedBidList); // Vérifie que l'objet n'est pas nul
+        assertEquals("Account Test Updated", updatedBidList.getAccount()); // Vérifie le champ "account"
+        assertEquals("Type Test Updated", updatedBidList.getType()); // Vérifie le champ "type"
+        assertEquals(30.0, updatedBidList.getBidQuantity()); // Vérifie le champ "bidQuantity"
     }
+
+
 
     @Test
     @WithMockUser
     public void testDeleteBidList() throws Exception {
         // Enregistrer un BidList pour le test
         BidList savedBidList = bidListService.insert(testBidList);
-        int id = savedBidList.getId();
+        int id = savedBidList.getBidListId();
 
         // Effectuer une requête GET sur /bidList/delete/{id}
         mockMvc.perform(get("/bidList/delete/" + id))

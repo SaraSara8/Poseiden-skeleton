@@ -1,8 +1,11 @@
 package com.nnk.springboot.services.impl;
 
+import com.nnk.springboot.domain.CurvePoint;
 import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.repositories.RatingRepository;
 import com.nnk.springboot.services.RatingService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,21 @@ public class RatingServiceImpl implements RatingService {
         logger.info("Récupération de toutes les notations");
         return ratingRepository.findAll();
     }
+
+
+
+    /**
+     * Récupère une page paginée de soumissions.
+     *
+     * @param pageable l'objet définissant la pagination (page actuelle, taille de la page, etc.).
+     * @return une page contenant les instances de {@link Rating}.
+     */
+    @Override
+    public Page<Rating> findPaginated(Pageable pageable) {
+        logger.info("Récupération de toutes les notations par page");
+        return ratingRepository.findAll(pageable);
+    }
+
 
     /**
      * Insère une nouvelle notation.

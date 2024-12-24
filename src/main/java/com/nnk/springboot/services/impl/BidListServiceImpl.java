@@ -6,13 +6,23 @@ import com.nnk.springboot.services.BidListService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
- * Service qui gère les opérations liées aux listes de soumissions ("BidList").
- * Ce service contient des méthodes pour insérer, supprimer, rechercher et vérifier l'existence d'une soumission.
+ * Implémentation du service gérant les opérations liées aux objets "BidList".
+ *
+ * Ce service fournit des fonctionnalités pour :
+ * - Rechercher toutes les soumissions ou une seule soumission par son identifiant.
+ * - Insérer une nouvelle soumission dans la base de données.
+ * - Supprimer une soumission existante.
+ * - Vérifier l'existence d'une soumission.
+ * - Gérer la pagination des soumissions.
+ *
+ * Ce service utilise un {@link BidListRepository} pour accéder aux données dans la base de données.
  */
 @Service
 public class BidListServiceImpl implements BidListService {
@@ -22,18 +32,18 @@ public class BidListServiceImpl implements BidListService {
     private final BidListRepository bidListRepository;
 
     /**
-     * Constructeur de BidListServiceImpl.
+     * Constructeur du service BidListServiceImpl.
      *
-     * @param bidListRepository le repository utilisé pour l'accès aux données de BidList
+     * @param bidListRepository le repository utilisé pour effectuer des opérations sur les données des soumissions.
      */
     public BidListServiceImpl(BidListRepository bidListRepository) {
         this.bidListRepository = bidListRepository;
     }
 
     /**
-     * Recherche de toutes les soumissions (BidLists).
+     * Récupère la liste de toutes les soumissions disponibles dans la base de données.
      *
-     * @return la liste de toutes les soumissions
+     * @return une liste contenant toutes les instances de {@link BidList}.
      */
     @Override
     public List<BidList> findAll() {
@@ -42,18 +52,30 @@ public class BidListServiceImpl implements BidListService {
     }
 
     /**
+     * Récupère une page paginée de soumissions.
+     *
+     * @param pageable l'objet définissant la pagination (page actuelle, taille de la page, etc.).
+     * @return une page contenant les instances de {@link BidList}.
+     */
+    @Override
+    public Page<BidList> findPaginated(Pageable pageable) {
+        logger.info("Recherche de toutes les soumissions par page.");
+        return bidListRepository.findAll(pageable);
+    }
+
+    /**
      * Recherche une soumission par son identifiant.
      *
-     * @param id l'identifiant de la soumission
-     * @return la soumission correspondante, ou une exception si elle n'existe pas
-     * @throws IllegalArgumentException si l'identifiant de la soumission est invalide
+     * @param id l'identifiant unique de la soumission à rechercher.
+     * @return l'objet {@link BidList} correspondant à l'identifiant.
+     * @throws IllegalArgumentException si aucune soumission n'est trouvée pour l'identifiant donné.
      */
     @Override
     public BidList findBidList(Integer id) {
         logger.info("Recherche de la soumission avec l'ID : {}", id);
         return bidListRepository.findById(id)
                 .orElseThrow(() -> {
-                    String errorMsg = "ID de soumission invalide: " + id;
+                    String errorMsg = "ID de soumission invalide : " + id;
                     logger.error(errorMsg);
                     return new IllegalArgumentException(errorMsg);
                 });
@@ -62,8 +84,8 @@ public class BidListServiceImpl implements BidListService {
     /**
      * Insère une nouvelle soumission dans la base de données.
      *
-     * @param bidList l'objet BidList à insérer
-     * @return l'objet BidList inséré
+     * @param bidList l'objet {@link BidList} à insérer.
+     * @return l'objet {@link BidList} après insertion avec son identifiant généré.
      */
     @Transactional
     @Override
@@ -73,22 +95,22 @@ public class BidListServiceImpl implements BidListService {
     }
 
     /**
-     * Supprime une soumission de la base de données.
+     * Supprime une soumission existante de la base de données.
      *
-     * @param bidList l'objet BidList à supprimer
+     * @param bidList l'objet {@link BidList} à supprimer.
      */
     @Transactional
     @Override
     public void delete(BidList bidList) {
-        logger.info("Suppression de la soumission avec l'ID : {}", bidList.getId());
-        bidListRepository.deleteById(bidList.getId());
+        logger.info("Suppression de la soumission avec l'ID : {}", bidList.getBidListDate());
+        bidListRepository.deleteById(bidList.getBidListId());
     }
 
     /**
-     * Vérifie si une soumission existe par son identifiant.
+     * Vérifie si une soumission existe dans la base de données en utilisant son identifiant.
      *
-     * @param id l'identifiant de la soumission
-     * @return true si la soumission existe, false sinon
+     * @param id l'identifiant unique de la soumission.
+     * @return {@code true} si la soumission existe, sinon {@code false}.
      */
     @Override
     public boolean existsById(int id) {

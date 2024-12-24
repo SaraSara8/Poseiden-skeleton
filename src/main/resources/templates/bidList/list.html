@@ -17,7 +17,7 @@
 			<a href="/ruleName/list">Rule</a>
 		</div>
 		<div class="col-6 text-right">
-			<!--/* Logged in user: <b th:inline="text" class="user"> [[${#httpServletRequest.remoteUser}]] </b> */-->
+			Logged in user: <b th:text="${loggedInUser}"  class="user"></b>
 			<form th:action="@{/logout}" method="POST">
 				<input type="submit" value="Logout"/>
 			</form>
@@ -38,19 +38,50 @@
 			</thead>
 			<tbody>
 				<tr th:each="bidList : ${bidLists}">
-					<td style="width: 10%" th:text="${bidList.id}"></td>
+					<td style="width: 10%" th:text="${bidList.bidListId}"></td>
 					<td th:text="${bidList.account}"></td>
 					<td th:text="${bidList.type}"></td>
 					<td th:text="${bidList.bidQuantity}"></td>
 
 					<td style="width: 15%" class="text-center">
-						<a th:href="@{/bidList/update/{id}(id=${bidList.id})}">Edit</a>&nbsp;|&nbsp;
-						<a th:href="@{/bidList/delete/{id}(id=${bidList.id})}">Delete</a>
+						<a th:href="@{/bidList/update/{id}(id=${bidList.bidListId})}" class="btn btn-warning btn-sm">Edit</a>&nbsp;|&nbsp;
+						<a th:href="@{/bidList/delete/{id}(id=${bidList.bidListId})}" class="btn btn-danger btn-sm">Delete</a>
 					</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
+
+	<!-- Pagination -->
+	<div class="row">
+		<div class="col-12 text-center">
+			<nav>
+				<ul class="pagination justify-content-center">
+					<!-- Previous Page -->
+					<li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+						<a class="page-link" th:href="@{/bidList/list(page=${currentPage - 1})}" aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+						</a>
+					</li>
+
+					<!-- Page Numbers -->
+					<li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+						th:classappend="${i == currentPage} ? 'active'">
+						<a class="page-link" th:href="@{/bidList/list(page=${i})}" th:text="${i + 1}"></a>
+					</li>
+
+					<!-- Next Page -->
+					<li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+						<a class="page-link" th:href="@{/bidList/list(page=${currentPage + 1})}" aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+
+
 </div>
 </body>
 </html>

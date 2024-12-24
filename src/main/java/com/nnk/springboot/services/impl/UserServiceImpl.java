@@ -4,6 +4,8 @@ import com.nnk.springboot.domain.User;
 import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.services.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -22,8 +24,11 @@ public class UserServiceImpl implements UserService {
 
     final private UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -37,6 +42,22 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(username).orElse(null);
     }
 
+
+
+    /**
+     * Récupère une page paginée de soumissions.
+     *
+     * @param pageable l'objet définissant la pagination (page actuelle, taille de la page, etc.).
+     * @return une page contenant les instances de {@link User}.
+     */
+    @Override
+    public Page<User> findPaginated(Pageable pageable) {
+        logger.info("Récupération de toutes les utilisateurs par page");
+        return userRepository.findAll(pageable);
+    }
+
+
+
     /**
      * Insère un nouvel utilisateur.
      * @param user L'utilisateur à insérer.
@@ -46,11 +67,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public User insert(User user) {
         logger.info("Insertion de l'utilisateur : {}", user);
-        // TODO
-        //user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
+
+
+    /**
+     * Mise à jour de utilisateur.
+     * @param user L'utilisateur à insérer.
+     * @return L'utilisateur inséré.
+     */
+    @Transactional
+    @Override
+    public User update(User user) {
+        logger.info("mise à jour de l'utilisateur : {}", user);
+
+        if (!user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        return userRepository.save(user);
+    }
+
+
 
     /**
      * Supprime un utilisateur.

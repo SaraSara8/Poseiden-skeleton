@@ -1,9 +1,15 @@
 package com.nnk.springboot.controllers;
 
+import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.domain.Trade;
 import com.nnk.springboot.services.TradeService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +27,13 @@ public class TradeController {
     private static final Logger logger = LogManager.getLogger(TradeController.class);
     private final TradeService tradeService;
 
+    @Value("${spring.data.web.pageable.default-page-size}")
+    private int defaultPageSize;
+
+    @Value("${spring.data.web.pageable.max-page-size}")
+    private int maxPageSize;
+
+
     public TradeController(TradeService tradeService) {
         this.tradeService = tradeService;
     }
@@ -28,14 +41,36 @@ public class TradeController {
     /**
      * Affiche la liste des Trades.
      *
+     * @param page  Numéro de la page à afficher (par défaut 0).
+     * @param size  Taille de la page (par défaut configurée dans les propriétés de l'application).
      * @param model Modèle pour transmettre les données à la vue.
      * @return Nom de la vue pour afficher les Trades.
      */
     @RequestMapping("/trade/list")
-    public String home(Model model) {
+    public String home(@RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "#{@environment.getProperty('spring.data.web.pageable.default-page-size')}") int size,
+                       Model model) {
+
         logger.info("Récupération de tous les Trades.");
-        List<Trade> trades = tradeService.findAllTrade();
-        model.addAttribute("trades", trades);
+
+        // Récupérer l'utilisateur connecté
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("loggedInUser", authentication.getName()); // Nom de l'utilisateur
+        } else {
+            model.addAttribute("loggedInUser", "Anonymous");
+        }
+
+        if (size > maxPageSize) {
+            size = maxPageSize;
+        }
+
+        Page<Trade> tradePage = tradeService.findPaginated(PageRequest.of(page, size));
+
+        model.addAttribute("trades", tradePage.getContent()); // Contenu de la page
+        model.addAttribute("currentPage", page); // Page actuelle
+        model.addAttribute("totalPages", tradePage.getTotalPages()); // Nombre total de pages
+
         return "trade/list";
     }
 

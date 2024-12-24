@@ -1,5 +1,6 @@
 package com.nnk.springboot.domain;
 
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,25 +19,23 @@ import lombok.Data;
 public class Rating {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
 
-    @NotBlank(message = "Moodys rating is mandatory")
+    @Column(name = "moodys_rating")
+    //@NotBlank(message = "Moodys rating is mandatory")
     private String moodysRating;
 
-    @NotBlank(message = "SandP rating is mandatory")
+    @Column(name = "sand_p_rating")
+    //@NotBlank(message = "SandP rating is mandatory")
     private String sandPRating;
 
-    @NotBlank(message = "Fitch rating is mandatory")
+    @Column(name = "fitch_rating")
+    //@NotBlank(message = "Fitch rating is mandatory")
     private String fitchRating;
 
+    @Column(name = "order_number")
     @Positive(message = "Order number must be positive")
     private Integer orderNumber;
 
-    /**
-     * Constructeur par défaut.
-     */
-    public Rating() {
-
-    }
 }

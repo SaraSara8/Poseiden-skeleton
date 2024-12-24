@@ -1,9 +1,13 @@
 package com.nnk.springboot.controllers;
 
+import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.services.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,17 +25,15 @@ public class UserController {
     private static final Logger logger = LogManager.getLogger(UserController.class);
     private final UserService userService;
 
+    @Value("${spring.data.web.pageable.default-page-size}")
+    private int defaultPageSize;
+
+    @Value("${spring.data.web.pageable.max-page-size}")
+    private int maxPageSize;
+
+
     public UserController(UserService userService) {
         this.userService = userService;
-    }
-
-
-
-
-
-    @GetMapping("/login")
-    public String login() {
-        return "login";
     }
 
 
@@ -39,14 +41,28 @@ public class UserController {
     /**
      * Affiche la liste des Utilisateurs.
      *
+     * @param page  Numéro de la page à afficher (par défaut 0).
+     * @param size  Taille de la page (par défaut configurée dans les propriétés de l'application).
      * @param model Modèle pour transmettre les données à la vue.
      * @return Nom de la vue pour afficher les Utilisateurs.
      */
     @RequestMapping("/user/list")
-    public String home(Model model) {
+    public String home(@RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "#{@environment.getProperty('spring.data.web.pageable.default-page-size')}") int size,
+                       Model model) {
+
         logger.info("Récupération de tous les Utilisateurs.");
-        List<User> users = userService.findAllUsers();
-        model.addAttribute("users", users);
+
+        if (size > maxPageSize) {
+            size = maxPageSize;
+        }
+
+        Page<User> userPage = userService.findPaginated(PageRequest.of(page, size));
+
+        model.addAttribute("users", userPage.getContent()); // Contenu de la page
+        model.addAttribute("currentPage", page); // Page actuelle
+        model.addAttribute("totalPages", userPage.getTotalPages()); // Nombre total de pages
+
         return "user/list";
     }
 
@@ -113,7 +129,7 @@ public class UserController {
             return "user/update";
         }
         logger.info("Mise à jour de l'Utilisateur avec l'ID : {}", id);
-        userService.insert(user);
+        userService.update(user);
         return "redirect:/user/list";
     }
 
