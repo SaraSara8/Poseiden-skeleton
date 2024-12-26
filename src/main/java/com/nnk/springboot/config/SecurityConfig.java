@@ -73,7 +73,7 @@ public class SecurityConfig {
                             .permitAll();
                 })
                 .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.accessDeniedPage("/error/403") // Redirection en cas d'accès interdit
+                        exceptionHandling.accessDeniedPage("/error/403")
                 )
                 .userDetailsService(customUserDetailsService); // Utiliser le service utilisateur personnalisé
         logger.info("Configuration de la chaîne de filtres de sécurité terminée.");
