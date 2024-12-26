@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.services.impl</a> &gt; <span class="el_source">UserServiceImpl.java</span></div><h1>UserServiceImpl.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.services.impl;
+
+import com.nnk.springboot.domain.User;
+import com.nnk.springboot.repositories.UserRepository;
+import com.nnk.springboot.services.UserService;
+import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+/**
+ * Implémentation du service User.
+ * Ce service permet de gérer les opérations liées aux utilisateurs du système.
+ */
+@Service
+public class UserServiceImpl implements UserService {
+
+<span class="fc" id="L23">    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);</span>
+
+    final private UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+<span class="fc" id="L29">    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {</span>
+<span class="fc" id="L30">        this.userRepository = userRepository;</span>
+<span class="fc" id="L31">        this.passwordEncoder = passwordEncoder;</span>
+<span class="fc" id="L32">    }</span>
+
+    /**
+     * Récupère un utilisateur par son nom d'utilisateur.
+     * @param username Le nom d'utilisateur.
+     * @return L'utilisateur trouvé ou null si non trouvé.
+     */
+    @Override
+    public User findByUsername(String username) {
+<span class="nc" id="L41">        logger.info(&quot;Recherche de l'utilisateur avec le nom d'utilisateur : {}&quot;, username);</span>
+<span class="nc" id="L42">        return userRepository.findByUsername(username).orElse(null);</span>
+    }
+
+
+
+    /**
+     * Récupère une page paginée de soumissions.
+     *
+     * @param pageable l'objet définissant la pagination (page actuelle, taille de la page, etc.).
+     * @return une page contenant les instances de {@link User}.
+     */
+    @Override
+    public Page&lt;User&gt; findPaginated(Pageable pageable) {
+<span class="fc" id="L55">        logger.info(&quot;Récupération de toutes les utilisateurs par page&quot;);</span>
+<span class="fc" id="L56">        return userRepository.findAll(pageable);</span>
+    }
+
+
+
+    /**
+     * Insère un nouvel utilisateur.
+     * @param user L'utilisateur à insérer.
+     * @return L'utilisateur inséré.
+     */
+    @Transactional
+    @Override
+    public User insert(User user) {
+<span class="fc" id="L69">        logger.info(&quot;Insertion de l'utilisateur : {}&quot;, user);</span>
+<span class="fc" id="L70">        user.setPassword(passwordEncoder.encode(user.getPassword()));</span>
+<span class="fc" id="L71">        return userRepository.save(user);</span>
+    }
+
+
+    /**
+     * Mise à jour de utilisateur.
+     * @param user L'utilisateur à insérer.
+     * @return L'utilisateur inséré.
+     */
+    @Transactional
+    @Override
+    public User update(User user) {
+<span class="fc" id="L83">        logger.info(&quot;mise à jour de l'utilisateur : {}&quot;, user);</span>
+
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (!user.getPassword().isEmpty()) {</span>
+<span class="fc" id="L86">            user.setPassword(passwordEncoder.encode(user.getPassword()));</span>
+        }
+<span class="fc" id="L88">        return userRepository.save(user);</span>
+    }
+
+
+
+    /**
+     * Supprime un utilisateur.
+     * @param user L'utilisateur à supprimer.
+     */
+    @Transactional
+    @Override
+    public void delete(User user) {
+<span class="fc" id="L100">        logger.info(&quot;Suppression de l'utilisateur avec l'ID : {}&quot;, user.getId());</span>
+<span class="fc" id="L101">        userRepository.deleteById(user.getId());</span>
+<span class="fc" id="L102">    }</span>
+
+    /**
+     * Trouve un utilisateur par son ID.
+     * @param id L'ID de l'utilisateur.
+     * @return L'utilisateur trouvé ou null si non trouvé.
+     */
+    @Override
+    public User findUser(Integer id) {
+<span class="fc" id="L111">        logger.info(&quot;Recherche de l'utilisateur avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L112">        return userRepository.findById(id).orElse(null);</span>
+    }
+
+    /**
+     * Récupère tous les utilisateurs.
+     * @return La liste des utilisateurs.
+     */
+    @Override
+    public List&lt;User&gt; findAllUsers() {
+<span class="fc" id="L121">        logger.info(&quot;Récupération de tous les utilisateurs&quot;);</span>
+<span class="fc" id="L122">        return userRepository.findAll();</span>
+    }
+
+    /**
+     * Vérifie si un utilisateur existe par son ID.
+     * @param id L'ID de l'utilisateur.
+     * @return true si l'utilisateur existe, false sinon.
+     */
+    @Override
+    public boolean existsById(int id) {
+<span class="fc" id="L132">        logger.info(&quot;Vérification de l'existence de l'utilisateur avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L133">        return userRepository.existsById(id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

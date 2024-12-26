@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.controllers</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.controllers;
+
+import com.nnk.springboot.domain.RuleName;
+import com.nnk.springboot.domain.User;
+import com.nnk.springboot.services.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+import java.util.List;
+
+/**
+ * Contrôleur pour la gestion des opérations sur les Utilisateurs (Users).
+ */
+@Controller
+public class UserController {
+
+<span class="fc" id="L25">    private static final Logger logger = LogManager.getLogger(UserController.class);</span>
+    private final UserService userService;
+
+    @Value(&quot;${spring.data.web.pageable.default-page-size}&quot;)
+    private int defaultPageSize;
+
+    @Value(&quot;${spring.data.web.pageable.max-page-size}&quot;)
+    private int maxPageSize;
+
+
+<span class="fc" id="L35">    public UserController(UserService userService) {</span>
+<span class="fc" id="L36">        this.userService = userService;</span>
+<span class="fc" id="L37">    }</span>
+
+
+
+    /**
+     * Affiche la liste des Utilisateurs.
+     *
+     * @param page  Numéro de la page à afficher (par défaut 0).
+     * @param size  Taille de la page (par défaut configurée dans les propriétés de l'application).
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour afficher les Utilisateurs.
+     */
+    @RequestMapping(&quot;/user/list&quot;)
+    public String home(@RequestParam(defaultValue = &quot;0&quot;) int page,
+                       @RequestParam(defaultValue = &quot;#{@environment.getProperty('spring.data.web.pageable.default-page-size')}&quot;) int size,
+                       Model model) {
+
+<span class="fc" id="L54">        logger.info(&quot;Récupération de tous les Utilisateurs.&quot;);</span>
+
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (size &gt; maxPageSize) {</span>
+<span class="nc" id="L57">            size = maxPageSize;</span>
+        }
+
+<span class="fc" id="L60">        Page&lt;User&gt; userPage = userService.findPaginated(PageRequest.of(page, size));</span>
+
+<span class="fc" id="L62">        model.addAttribute(&quot;users&quot;, userPage.getContent()); // Contenu de la page</span>
+<span class="fc" id="L63">        model.addAttribute(&quot;currentPage&quot;, page); // Page actuelle</span>
+<span class="fc" id="L64">        model.addAttribute(&quot;totalPages&quot;, userPage.getTotalPages()); // Nombre total de pages</span>
+
+<span class="fc" id="L66">        return &quot;user/list&quot;;</span>
+    }
+
+    /**
+     * Affiche le formulaire pour ajouter un nouvel Utilisateur.
+     *
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour ajouter un Utilisateur.
+     */
+    @GetMapping(&quot;/user/add&quot;)
+    public String addUserForm(Model model) {
+<span class="fc" id="L77">        logger.info(&quot;Affichage du formulaire pour ajouter un nouvel Utilisateur.&quot;);</span>
+<span class="fc" id="L78">        model.addAttribute(&quot;user&quot;, new User());</span>
+<span class="fc" id="L79">        return &quot;user/add&quot;;</span>
+    }
+
+    /**
+     * Valide et enregistre un nouvel Utilisateur.
+     *
+     * @param user   Utilisateur à valider et enregistrer.
+     * @param result Résultat de la validation.
+     * @param model  Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste si réussite, sinon recharge le formulaire.
+     */
+    @PostMapping(&quot;/user/validate&quot;)
+    public String validate(@Valid User user, BindingResult result, Model model) {
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L93">            logger.error(&quot;Échec de la validation pour l'Utilisateur : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L94">            return &quot;user/add&quot;;</span>
+        }
+<span class="fc" id="L96">        logger.info(&quot;Enregistrement d'un nouvel Utilisateur : {}&quot;, user);</span>
+<span class="fc" id="L97">        userService.insert(user);</span>
+<span class="fc" id="L98">        return &quot;redirect:/user/list&quot;;</span>
+    }
+
+    /**
+     * Affiche le formulaire pour mettre à jour un Utilisateur existant.
+     *
+     * @param id    Identifiant de l'Utilisateur à mettre à jour.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour mettre à jour un Utilisateur.
+     */
+    @GetMapping(&quot;/user/update/{id}&quot;)
+    public String showUpdateForm(@PathVariable(&quot;id&quot;) Integer id, Model model) {
+<span class="fc" id="L110">        logger.info(&quot;Récupération de l'Utilisateur avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L111">        User user = userService.findUser(id);</span>
+<span class="fc" id="L112">        model.addAttribute(&quot;user&quot;, user);</span>
+<span class="fc" id="L113">        return &quot;user/update&quot;;</span>
+    }
+
+    /**
+     * Met à jour un Utilisateur existant.
+     *
+     * @param id     Identifiant de l'Utilisateur à mettre à jour.
+     * @param user   Données mises à jour de l'Utilisateur.
+     * @param result Résultat de la validation.
+     * @param model  Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste si réussite, sinon recharge le formulaire.
+     */
+    @PostMapping(&quot;/user/update/{id}&quot;)
+    public String updateUser(@PathVariable(&quot;id&quot;) Integer id, @Valid User user, BindingResult result, Model model) {
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L128">            logger.error(&quot;Échec de la validation pour la mise à jour de l'Utilisateur : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L129">            return &quot;user/update&quot;;</span>
+        }
+<span class="fc" id="L131">        logger.info(&quot;Mise à jour de l'Utilisateur avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L132">        userService.update(user);</span>
+<span class="fc" id="L133">        return &quot;redirect:/user/list&quot;;</span>
+    }
+
+    /**
+     * Supprime un Utilisateur existant.
+     *
+     * @param id    Identifiant de l'Utilisateur à supprimer.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste après suppression.
+     */
+    @GetMapping(&quot;/user/delete/{id}&quot;)
+    public String deleteUser(@PathVariable(&quot;id&quot;) Integer id, Model model) {
+<span class="fc" id="L145">        logger.info(&quot;Suppression de l'Utilisateur avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L146">        User user = userService.findUser(id);</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        if (user != null) {</span>
+<span class="fc" id="L148">            userService.delete(user);</span>
+        }
+<span class="fc" id="L150">        return &quot;redirect:/user/list&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

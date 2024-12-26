@@ -19,9 +19,11 @@ public class AppConfig {
      *
      * @return Un PasswordEncoder utilisant BCrypt.
      */
-    @Bean
+   @Bean
     public PasswordEncoder passwordEncoder() {
         logger.info("genéré le mot de passe");
         return new BCryptPasswordEncoder();
-    }
+
+       }
+
 }

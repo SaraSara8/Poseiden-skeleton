@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RatingController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.controllers</a> &gt; <span class="el_source">RatingController.java</span></div><h1>RatingController.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.controllers;
+
+import com.nnk.springboot.domain.BidList;
+import com.nnk.springboot.domain.Rating;
+import com.nnk.springboot.services.RatingService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+import java.util.List;
+
+/**
+ * Contrôleur pour la gestion des opérations sur les Ratings.
+ */
+@Controller
+public class RatingController {
+
+<span class="fc" id="L27">    private static final Logger logger = LogManager.getLogger(RatingController.class);</span>
+    private final RatingService ratingService;
+
+    @Value(&quot;${spring.data.web.pageable.default-page-size}&quot;)
+    private int defaultPageSize;
+
+    @Value(&quot;${spring.data.web.pageable.max-page-size}&quot;)
+    private int maxPageSize;
+
+
+<span class="fc" id="L37">    public RatingController(RatingService ratingService) {</span>
+<span class="fc" id="L38">        this.ratingService = ratingService;</span>
+<span class="fc" id="L39">    }</span>
+
+    /**
+     * Affiche la liste des Ratings.
+     *
+     * @param page  Numéro de la page à afficher (par défaut 0).
+     * @param size  Taille de la page (par défaut configurée dans les propriétés de l'application).
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour afficher les Ratings.
+     */
+    @RequestMapping(&quot;/rating/list&quot;)
+    public String home(@RequestParam(defaultValue = &quot;0&quot;) int page,
+                       @RequestParam(defaultValue = &quot;#{@environment.getProperty('spring.data.web.pageable.default-page-size')}&quot;) int size,
+                       Model model) {
+
+<span class="fc" id="L54">        logger.info(&quot;Récupération de tous les Ratings.&quot;);</span>
+
+        // Récupérer l'utilisateur connecté
+<span class="fc" id="L57">        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="pc bpc" id="L58" title="2 of 4 branches missed.">        if (authentication != null &amp;&amp; authentication.isAuthenticated()) {</span>
+<span class="fc" id="L59">            model.addAttribute(&quot;loggedInUser&quot;, authentication.getName()); // Nom de l'utilisateur</span>
+        } else {
+<span class="nc" id="L61">            model.addAttribute(&quot;loggedInUser&quot;, &quot;Anonymous&quot;);</span>
+        }
+
+
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (size &gt; maxPageSize) {</span>
+<span class="nc" id="L66">            size = maxPageSize;</span>
+        }
+
+
+<span class="fc" id="L70">        Page&lt;Rating&gt; ratingPage = ratingService.findPaginated(PageRequest.of(page, size));</span>
+
+<span class="fc" id="L72">        model.addAttribute(&quot;ratings&quot;, ratingPage.getContent()); // Contenu de la page</span>
+<span class="fc" id="L73">        model.addAttribute(&quot;currentPage&quot;, page); // Page actuelle</span>
+<span class="fc" id="L74">        model.addAttribute(&quot;totalPages&quot;, ratingPage.getTotalPages()); // Nombre total de pages</span>
+
+<span class="fc" id="L76">        return &quot;rating/list&quot;;</span>
+    }
+
+    /**
+     * Affiche le formulaire pour ajouter un nouveau Rating.
+     *
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour ajouter un Rating.
+     */
+    @GetMapping(&quot;/rating/add&quot;)
+    public String addRatingForm(Model model) {
+<span class="fc" id="L87">        logger.info(&quot;Affichage du formulaire pour ajouter un nouveau Rating.&quot;);</span>
+<span class="fc" id="L88">        model.addAttribute(&quot;rating&quot;, new Rating());</span>
+<span class="fc" id="L89">        return &quot;rating/add&quot;;</span>
+    }
+
+    /**
+     * Valide et enregistre un nouveau Rating.
+     *
+     * @param rating Rating à valider et enregistrer.
+     * @param result Résultat de la validation.
+     * @param model  Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste si réussite, sinon recharge le formulaire.
+     */
+    @PostMapping(&quot;/rating/validate&quot;)
+    public String validate(@Valid Rating rating, BindingResult result, Model model) {
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L103">            logger.error(&quot;Échec de la validation pour le Rating : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L104">            return &quot;rating/add&quot;;</span>
+        }
+<span class="fc" id="L106">        logger.info(&quot;Enregistrement d'un nouveau Rating : {}&quot;, rating);</span>
+<span class="fc" id="L107">        ratingService.insert(rating);</span>
+<span class="fc" id="L108">        return &quot;redirect:/rating/list&quot;;</span>
+    }
+
+    /**
+     * Affiche le formulaire pour mettre à jour un Rating existant.
+     *
+     * @param id    Identifiant du Rating à mettre à jour.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour mettre à jour un Rating.
+     */
+    @GetMapping(&quot;/rating/update/{id}&quot;)
+    public String showUpdateForm(@PathVariable(&quot;id&quot;) Integer id, Model model) {
+<span class="fc" id="L120">        logger.info(&quot;Récupération du Rating avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L121">        Rating rating = ratingService.findRating(id);</span>
+<span class="fc" id="L122">        model.addAttribute(&quot;rating&quot;, rating);</span>
+<span class="fc" id="L123">        return &quot;rating/update&quot;;</span>
+    }
+
+    /**
+     * Met à jour un Rating existant.
+     *
+     * @param id      Identifiant du Rating à mettre à jour.
+     * @param rating  Données mises à jour du Rating.
+     * @param result  Résultat de la validation.
+     * @param model   Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste si réussite, sinon recharge le formulaire.
+     */
+    @PostMapping(&quot;/rating/update/{id}&quot;)
+    public String updateRating(@PathVariable(&quot;id&quot;) Integer id, @Valid Rating rating, BindingResult result, Model model) {
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L138">            logger.error(&quot;Échec de la validation pour la mise à jour du Rating : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L139">            return &quot;rating/update&quot;;</span>
+        }
+<span class="fc" id="L141">        logger.info(&quot;Mise à jour du Rating avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L142">        ratingService.insert(rating);</span>
+<span class="fc" id="L143">        return &quot;redirect:/rating/list&quot;;</span>
+    }
+
+    /**
+     * Supprime un Rating existant.
+     *
+     * @param id    Identifiant du Rating à supprimer.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste après suppression.
+     */
+    @GetMapping(&quot;/rating/delete/{id}&quot;)
+    public String deleteRating(@PathVariable(&quot;id&quot;) Integer id, Model model) {
+<span class="fc" id="L155">        logger.info(&quot;Suppression du Rating avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L156">        Rating rating = ratingService.findRating(id);</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">        if (rating != null) {</span>
+<span class="fc" id="L158">            ratingService.delete(rating);</span>
+        }
+<span class="fc" id="L160">        return &quot;redirect:/rating/list&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

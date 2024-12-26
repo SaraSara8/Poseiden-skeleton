@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BidListServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.services.impl</a> &gt; <span class="el_source">BidListServiceImpl.java</span></div><h1>BidListServiceImpl.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.services.impl;
+
+import com.nnk.springboot.domain.BidList;
+import com.nnk.springboot.repositories.BidListRepository;
+import com.nnk.springboot.services.BidListService;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Implémentation du service gérant les opérations liées aux objets &quot;BidList&quot;.
+ *
+ * Ce service fournit des fonctionnalités pour :
+ * - Rechercher toutes les soumissions ou une seule soumission par son identifiant.
+ * - Insérer une nouvelle soumission dans la base de données.
+ * - Supprimer une soumission existante.
+ * - Vérifier l'existence d'une soumission.
+ * - Gérer la pagination des soumissions.
+ *
+ * Ce service utilise un {@link BidListRepository} pour accéder aux données dans la base de données.
+ */
+@Service
+public class BidListServiceImpl implements BidListService {
+
+<span class="fc" id="L30">    private static final Logger logger = LoggerFactory.getLogger(BidListServiceImpl.class);</span>
+
+    private final BidListRepository bidListRepository;
+
+    /**
+     * Constructeur du service BidListServiceImpl.
+     *
+     * @param bidListRepository le repository utilisé pour effectuer des opérations sur les données des soumissions.
+     */
+<span class="fc" id="L39">    public BidListServiceImpl(BidListRepository bidListRepository) {</span>
+<span class="fc" id="L40">        this.bidListRepository = bidListRepository;</span>
+<span class="fc" id="L41">    }</span>
+
+    /**
+     * Récupère la liste de toutes les soumissions disponibles dans la base de données.
+     *
+     * @return une liste contenant toutes les instances de {@link BidList}.
+     */
+    @Override
+    public List&lt;BidList&gt; findAll() {
+<span class="fc" id="L50">        logger.info(&quot;Recherche de toutes les soumissions.&quot;);</span>
+<span class="fc" id="L51">        return bidListRepository.findAll();</span>
+    }
+
+    /**
+     * Récupère une page paginée de soumissions.
+     *
+     * @param pageable l'objet définissant la pagination (page actuelle, taille de la page, etc.).
+     * @return une page contenant les instances de {@link BidList}.
+     */
+    @Override
+    public Page&lt;BidList&gt; findPaginated(Pageable pageable) {
+<span class="fc" id="L62">        logger.info(&quot;Recherche de toutes les soumissions par page.&quot;);</span>
+<span class="fc" id="L63">        return bidListRepository.findAll(pageable);</span>
+    }
+
+    /**
+     * Recherche une soumission par son identifiant.
+     *
+     * @param id l'identifiant unique de la soumission à rechercher.
+     * @return l'objet {@link BidList} correspondant à l'identifiant.
+     * @throws IllegalArgumentException si aucune soumission n'est trouvée pour l'identifiant donné.
+     */
+    @Override
+    public BidList findBidList(Integer id) {
+<span class="fc" id="L75">        logger.info(&quot;Recherche de la soumission avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L76">        return bidListRepository.findById(id)</span>
+<span class="fc" id="L77">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L78">                    String errorMsg = &quot;ID de soumission invalide : &quot; + id;</span>
+<span class="nc" id="L79">                    logger.error(errorMsg);</span>
+<span class="nc" id="L80">                    return new IllegalArgumentException(errorMsg);</span>
+                });
+    }
+
+    /**
+     * Insère une nouvelle soumission dans la base de données.
+     *
+     * @param bidList l'objet {@link BidList} à insérer.
+     * @return l'objet {@link BidList} après insertion avec son identifiant généré.
+     */
+    @Transactional
+    @Override
+    public BidList insert(BidList bidList) {
+<span class="fc" id="L93">        logger.info(&quot;Insertion de la soumission : {}&quot;, bidList);</span>
+<span class="fc" id="L94">        return bidListRepository.save(bidList);</span>
+    }
+
+    /**
+     * Supprime une soumission existante de la base de données.
+     *
+     * @param bidList l'objet {@link BidList} à supprimer.
+     */
+    @Transactional
+    @Override
+    public void delete(BidList bidList) {
+<span class="fc" id="L105">        logger.info(&quot;Suppression de la soumission avec l'ID : {}&quot;, bidList.getBidListDate());</span>
+<span class="fc" id="L106">        bidListRepository.deleteById(bidList.getBidListId());</span>
+<span class="fc" id="L107">    }</span>
+
+    /**
+     * Vérifie si une soumission existe dans la base de données en utilisant son identifiant.
+     *
+     * @param id l'identifiant unique de la soumission.
+     * @return {@code true} si la soumission existe, sinon {@code false}.
+     */
+    @Override
+    public boolean existsById(int id) {
+<span class="fc" id="L117">        logger.info(&quot;Vérification de l'existence de la soumission avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L118">        return bidListRepository.existsById(id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

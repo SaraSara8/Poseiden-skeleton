@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RuleNameController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.controllers</a> &gt; <span class="el_source">RuleNameController.java</span></div><h1>RuleNameController.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.controllers;
+
+import com.nnk.springboot.domain.CurvePoint;
+import com.nnk.springboot.domain.RuleName;
+import com.nnk.springboot.services.RuleNameService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+import java.util.List;
+
+/**
+ * Contrôleur pour la gestion des opérations sur les règles de nom (RuleName).
+ */
+@Controller
+public class RuleNameController {
+
+<span class="fc" id="L27">    private static final Logger logger = LogManager.getLogger(RuleNameController.class);</span>
+    private final RuleNameService ruleNameService;
+
+    @Value(&quot;${spring.data.web.pageable.default-page-size}&quot;)
+    private int defaultPageSize;
+
+    @Value(&quot;${spring.data.web.pageable.max-page-size}&quot;)
+    private int maxPageSize;
+
+
+<span class="fc" id="L37">    public RuleNameController(RuleNameService ruleNameService) {</span>
+<span class="fc" id="L38">        this.ruleNameService = ruleNameService;</span>
+<span class="fc" id="L39">    }</span>
+
+    /**
+     * Affiche la liste des règles de nom.
+     *
+     * @param page  Numéro de la page à afficher (par défaut 0).
+     * @param size  Taille de la page (par défaut configurée dans les propriétés de l'application).
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour afficher la liste des règles de nom.
+     */
+    @RequestMapping(&quot;/ruleName/list&quot;)
+    public String home(@RequestParam(defaultValue = &quot;0&quot;) int page,
+                       @RequestParam(defaultValue = &quot;#{@environment.getProperty('spring.data.web.pageable.default-page-size')}&quot;) int size,
+                       Model model) {
+
+<span class="fc" id="L54">        logger.info(&quot;Récupération de toutes les règles de nom.&quot;);</span>
+
+        // Récupérer l'utilisateur connecté
+<span class="fc" id="L57">        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="pc bpc" id="L58" title="2 of 4 branches missed.">        if (authentication != null &amp;&amp; authentication.isAuthenticated()) {</span>
+<span class="fc" id="L59">            model.addAttribute(&quot;loggedInUser&quot;, authentication.getName()); // Nom de l'utilisateur</span>
+        } else {
+<span class="nc" id="L61">            model.addAttribute(&quot;loggedInUser&quot;, &quot;Anonymous&quot;);</span>
+        }
+
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (size &gt; maxPageSize) {</span>
+<span class="nc" id="L65">            size = maxPageSize;</span>
+        }
+
+<span class="fc" id="L68">        Page&lt;RuleName&gt; ruleNamePage = ruleNameService.findPaginated(PageRequest.of(page, size));</span>
+
+<span class="fc" id="L70">        model.addAttribute(&quot;ruleNames&quot;, ruleNamePage.getContent()); // Contenu de la page</span>
+<span class="fc" id="L71">        model.addAttribute(&quot;currentPage&quot;, page); // Page actuelle</span>
+<span class="fc" id="L72">        model.addAttribute(&quot;totalPages&quot;, ruleNamePage.getTotalPages()); // Nombre total de pages</span>
+
+<span class="fc" id="L74">        return &quot;ruleName/list&quot;;</span>
+    }
+
+    /**
+     * Affiche le formulaire pour ajouter une nouvelle règle de nom.
+     *
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour ajouter une règle de nom.
+     */
+    @GetMapping(&quot;/ruleName/add&quot;)
+    public String addRuleNameForm(Model model) {
+<span class="fc" id="L85">        logger.info(&quot;Affichage du formulaire pour ajouter une nouvelle règle de nom.&quot;);</span>
+<span class="fc" id="L86">        model.addAttribute(&quot;ruleName&quot;, new RuleName());</span>
+<span class="fc" id="L87">        return &quot;ruleName/add&quot;;</span>
+    }
+
+    /**
+     * Valide et enregistre une nouvelle règle de nom.
+     *
+     * @param ruleName Règle de nom à valider et enregistrer.
+     * @param result   Résultat de la validation.
+     * @param model    Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste des règles de nom si la validation réussie, sinon recharge le formulaire.
+     */
+    @PostMapping(&quot;/ruleName/validate&quot;)
+    public String validate(@Valid RuleName ruleName, BindingResult result, Model model) {
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L101">            logger.error(&quot;Échec de la validation pour la règle de nom : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L102">            return &quot;ruleName/add&quot;;</span>
+        }
+<span class="fc" id="L104">        logger.info(&quot;Enregistrement d'une nouvelle règle de nom : {}&quot;, ruleName);</span>
+<span class="fc" id="L105">        ruleNameService.insert(ruleName);</span>
+<span class="fc" id="L106">        return &quot;redirect:/ruleName/list&quot;;</span>
+    }
+
+    /**
+     * Affiche le formulaire pour mettre à jour une règle de nom existante.
+     *
+     * @param id    Identifiant de la règle de nom à mettre à jour.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour mettre à jour une règle de nom.
+     */
+    @GetMapping(&quot;/ruleName/update/{id}&quot;)
+    public String showUpdateForm(@PathVariable(&quot;id&quot;) Integer id, Model model) {
+<span class="fc" id="L118">        logger.info(&quot;Récupération de la règle de nom avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L119">        RuleName ruleName = ruleNameService.findRuleName(id);</span>
+<span class="fc" id="L120">        model.addAttribute(&quot;ruleName&quot;, ruleName);</span>
+<span class="fc" id="L121">        return &quot;ruleName/update&quot;;</span>
+    }
+
+    /**
+     * Met à jour une règle de nom existante.
+     *
+     * @param id       Identifiant de la règle de nom à mettre à jour.
+     * @param ruleName Données mises à jour de la règle de nom.
+     * @param result   Résultat de la validation.
+     * @param model    Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste des règles de nom si la mise à jour réussie, sinon recharge le formulaire.
+     */
+    @PostMapping(&quot;/ruleName/update/{id}&quot;)
+    public String updateRuleName(@PathVariable(&quot;id&quot;) Integer id, @Valid RuleName ruleName, BindingResult result, Model model) {
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L136">            logger.error(&quot;Échec de la validation pour la mise à jour de la règle de nom : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L137">            return &quot;ruleName/update&quot;;</span>
+        }
+<span class="fc" id="L139">        logger.info(&quot;Mise à jour de la règle de nom avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L140">        ruleNameService.insert(ruleName);</span>
+<span class="fc" id="L141">        return &quot;redirect:/ruleName/list&quot;;</span>
+    }
+
+    /**
+     * Supprime une règle de nom existante.
+     *
+     * @param id    Identifiant de la règle de nom à supprimer.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste des règles de nom après suppression.
+     */
+    @GetMapping(&quot;/ruleName/delete/{id}&quot;)
+    public String deleteRuleName(@PathVariable(&quot;id&quot;) Integer id, Model model) {
+<span class="fc" id="L153">        logger.info(&quot;Suppression de la règle de nom avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L154">        RuleName ruleName = ruleNameService.findRuleName(id);</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        if (ruleName != null) {</span>
+<span class="fc" id="L156">            ruleNameService.delete(ruleName);</span>
+        }
+<span class="fc" id="L158">        return &quot;redirect:/ruleName/list&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

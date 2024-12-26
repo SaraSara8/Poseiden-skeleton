@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BidListController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-skeleton</a> &gt; <a href="index.source.html" class="el_package">com.nnk.springboot.controllers</a> &gt; <span class="el_source">BidListController.java</span></div><h1>BidListController.java</h1><pre class="source lang-java linenums">package com.nnk.springboot.controllers;
+
+import com.nnk.springboot.domain.BidList;
+import com.nnk.springboot.services.BidListService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+import java.util.List;
+
+/**
+ * Contrôleur pour la gestion des opérations sur les BidLists.
+ */
+@Controller
+public class BidListController {
+
+<span class="fc" id="L27">    private static final Logger logger = LogManager.getLogger(BidListController.class);</span>
+    private final BidListService bidListService;
+
+
+    @Value(&quot;${spring.data.web.pageable.default-page-size}&quot;)
+    private int defaultPageSize;
+
+    @Value(&quot;${spring.data.web.pageable.max-page-size}&quot;)
+    private int maxPageSize;
+
+
+<span class="fc" id="L38">    public BidListController(BidListService bidListService) {</span>
+<span class="fc" id="L39">        this.bidListService = bidListService;</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * Affiche la liste des BidLists avec prise en charge de la pagination.
+     *
+     * @param page  Numéro de la page à afficher (par défaut 0).
+     * @param size  Taille de la page (par défaut configurée dans les propriétés de l'application).
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Le nom de la vue pour afficher la liste des BidLists.
+     */
+    @RequestMapping(&quot;/bidList/list&quot;)
+    public String home(@RequestParam(defaultValue = &quot;0&quot;) int page,
+                       @RequestParam(defaultValue = &quot;#{@environment.getProperty('spring.data.web.pageable.default-page-size')}&quot;) int size,
+                       Model model) {
+
+<span class="fc" id="L55">        logger.info(&quot;Récupération de toutes les BidLists.&quot;);</span>
+
+        // Récupérer l'utilisateur connecté
+<span class="fc" id="L58">        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="pc bpc" id="L59" title="2 of 4 branches missed.">        if (authentication != null &amp;&amp; authentication.isAuthenticated()) {</span>
+<span class="fc" id="L60">            model.addAttribute(&quot;loggedInUser&quot;, authentication.getName()); // Nom de l'utilisateur</span>
+        } else {
+<span class="nc" id="L62">            model.addAttribute(&quot;loggedInUser&quot;, &quot;Anonymous&quot;);</span>
+        }
+
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (size &gt; maxPageSize) {</span>
+<span class="nc" id="L66">            size = maxPageSize;</span>
+        }
+
+
+<span class="fc" id="L70">        Page&lt;BidList&gt; bidListPage = bidListService.findPaginated(PageRequest.of(page, size));</span>
+
+<span class="fc" id="L72">        model.addAttribute(&quot;bidLists&quot;, bidListPage.getContent()); // Contenu de la page</span>
+<span class="fc" id="L73">        model.addAttribute(&quot;currentPage&quot;, page); // Page actuelle</span>
+<span class="fc" id="L74">        model.addAttribute(&quot;totalPages&quot;, bidListPage.getTotalPages()); // Nombre total de pages</span>
+
+
+<span class="fc" id="L77">        return &quot;bidList/list&quot;;</span>
+    }
+
+    /**
+     * Affiche le formulaire pour ajouter une nouvelle BidList.
+     *
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour ajouter une BidList.
+     */
+    @GetMapping(&quot;/bidList/add&quot;)
+    public String addBidForm(Model model) {
+<span class="fc" id="L88">        logger.info(&quot;Affichage du formulaire pour ajouter une nouvelle BidList.&quot;);</span>
+<span class="fc" id="L89">        model.addAttribute(&quot;bidList&quot;, new BidList());</span>
+<span class="fc" id="L90">        return &quot;bidList/add&quot;;</span>
+    }
+
+    /**
+     * Valide et enregistre une nouvelle BidList.
+     *
+     * @param bidList BidList à valider et enregistrer.
+     * @param result  Résultat de la validation.
+     * @param model   Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste si réussite, sinon recharge le formulaire.
+     */
+    @PostMapping(&quot;/bidList/validate&quot;)
+    public String validate(@Valid BidList bidList, BindingResult result, Model model) {
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L104">            logger.error(&quot;Échec de la validation pour la BidList : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L105">            return &quot;bidList/add&quot;;</span>
+        }
+<span class="fc" id="L107">        logger.info(&quot;Enregistrement d'une nouvelle BidList : {}&quot;, bidList);</span>
+<span class="fc" id="L108">        bidListService.insert(bidList);</span>
+<span class="fc" id="L109">        return &quot;redirect:/bidList/list&quot;;</span>
+    }
+
+    /**
+     * Affiche le formulaire pour mettre à jour une BidList existante.
+     *
+     * @param id    Identifiant de la BidList à mettre à jour.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Nom de la vue pour mettre à jour une BidList.
+     */
+    @GetMapping(&quot;/bidList/update/{id}&quot;)
+    public String showUpdateForm(@PathVariable(&quot;id&quot;) Integer id, Model model) {
+<span class="fc" id="L121">        logger.info(&quot;Récupération de la BidList avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L122">        BidList bidList = bidListService.findBidList(id);</span>
+<span class="fc" id="L123">        model.addAttribute(&quot;bidList&quot;, bidList);</span>
+<span class="fc" id="L124">        return &quot;bidList/update&quot;;</span>
+    }
+
+    /**
+     * Met à jour une BidList existante.
+     *
+     * @param id      Identifiant de la BidList à mettre à jour.
+     * @param bidList Données mises à jour de la BidList.
+     * @param result  Résultat de la validation.
+     * @param model   Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste si réussite, sinon recharge le formulaire.
+     */
+    @PostMapping(&quot;/bidList/update/{id}&quot;)
+    public String updateBid(@PathVariable(&quot;id&quot;) Integer id, @Valid BidList bidList, BindingResult result, Model model) {
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L139">            logger.error(&quot;Échec de la validation pour la mise à jour de la BidList : {}&quot;, result.getAllErrors());</span>
+<span class="nc" id="L140">            return &quot;bidList/update&quot;;</span>
+        }
+<span class="fc" id="L142">        logger.info(&quot;Mise à jour de la BidList avec l'ID : {}&quot;, id);</span>
+        // Assurez que l'ID est défini sur l'objet bidList
+<span class="fc" id="L144">        bidList.setBidListId(id);</span>
+<span class="fc" id="L145">        bidListService.insert(bidList);</span>
+<span class="fc" id="L146">        return &quot;redirect:/bidList/list&quot;;</span>
+    }
+
+    /**
+     * Supprime une BidList existante.
+     *
+     * @param id    Identifiant de la BidList à supprimer.
+     * @param model Modèle pour transmettre les données à la vue.
+     * @return Redirection vers la liste après suppression.
+     */
+    @GetMapping(&quot;/bidList/delete/{id}&quot;)
+    public String deleteBid(@PathVariable(&quot;id&quot;) Integer id, Model model) {
+<span class="fc" id="L158">        logger.info(&quot;Suppression de la BidList avec l'ID : {}&quot;, id);</span>
+<span class="fc" id="L159">        BidList bidList = bidListService.findBidList(id);</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">        if (bidList != null) {</span>
+<span class="fc" id="L161">            bidListService.delete(bidList);</span>
+        }
+<span class="fc" id="L163">        return &quot;redirect:/bidList/list&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
