@@ -1,4 +1,5 @@
 com/nnk/springboot/BidTests.class
+com/nnk/springboot/config/CustomAuthenticationSuccessHandlerTests.class
 com/nnk/springboot/controller/TradeControllerTests.class
 com/nnk/springboot/controller/UserControllerTests.class
 com/nnk/springboot/controller/CurvePointControllerTests.class
@@ -6,8 +7,9 @@ com/nnk/springboot/PasswordEncodeTest.class
 com/nnk/springboot/TradeTests.class
 com/nnk/springboot/RatingTests.class
 com/nnk/springboot/RuleTests.class
-com/nnk/springboot/config/UserServiceImplIntegrationTest.class
 com/nnk/springboot/controller/RuleNameControllerTests.class
+com/nnk/springboot/config/CustomUserDetailsServiceTests.class
 com/nnk/springboot/controller/BidListControllerTests.class
 com/nnk/springboot/CurvePointTests.class
 com/nnk/springboot/controller/RatingControllerTests.class
+com/nnk/springboot/config/CustomAuthenticationSuccessHandlerTests$TestSecurityConfig.class

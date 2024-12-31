@@ -57,23 +57,23 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-<span class="nc" id="L60">        logger.info(&quot;Chargement des détails de l'utilisateur avec le nom d'utilisateur : {}&quot;, username);</span>
+<span class="fc" id="L60">        logger.info(&quot;Chargement des détails de l'utilisateur avec le nom d'utilisateur : {}&quot;, username);</span>
 
         // Recherche de l'utilisateur dans la base de données
-<span class="nc" id="L63">        User user = userService.findByUsername(username);</span>
-<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (user == null) {</span>
-<span class="nc" id="L65">            logger.error(&quot;Utilisateur non trouvé avec le nom d'utilisateur : {}&quot;, username);</span>
-<span class="nc" id="L66">            throw new UsernameNotFoundException(&quot;Utilisateur non trouvé&quot;);</span>
+<span class="fc" id="L63">        User user = userService.findByUsername(username);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (user == null) {</span>
+<span class="fc" id="L65">            logger.error(&quot;Utilisateur non trouvé avec le nom d'utilisateur : {}&quot;, username);</span>
+<span class="fc" id="L66">            throw new UsernameNotFoundException(&quot;Utilisateur non trouvé&quot;);</span>
         }
 
-<span class="nc" id="L69">        logger.info(&quot;Utilisateur trouvé : {} avec le rôle : {}&quot;, user.getUsername(), user.getRole());</span>
+<span class="fc" id="L69">        logger.info(&quot;Utilisateur trouvé : {} avec le rôle : {}&quot;, user.getUsername(), user.getRole());</span>
 
         // Retourne un objet UserDetails pour Spring Security
-<span class="nc" id="L72">        return new org.springframework.security.core.userdetails.User(</span>
-<span class="nc" id="L73">                user.getUsername(),</span>
-<span class="nc" id="L74">                user.getPassword(),</span>
+<span class="fc" id="L72">        return new org.springframework.security.core.userdetails.User(</span>
+<span class="fc" id="L73">                user.getUsername(),</span>
+<span class="fc" id="L74">                user.getPassword(),</span>
                 true, true, true, true,
-<span class="nc" id="L76">                getAuthorities(user.getRole())</span>
+<span class="fc" id="L76">                getAuthorities(user.getRole())</span>
         );
     }
 
@@ -84,13 +84,13 @@ public class CustomUserDetailsService implements UserDetailsService {
      * @return Une liste d'autorisations.
      */
     private List&lt;GrantedAuthority&gt; getAuthorities(String roleUser) {
-<span class="nc" id="L87">        logger.debug(&quot;Conversion du rôle '{}' en autorité Spring Security.&quot;, roleUser);</span>
+<span class="fc" id="L87">        logger.debug(&quot;Conversion du rôle '{}' en autorité Spring Security.&quot;, roleUser);</span>
 
-<span class="nc" id="L89">        List&lt;GrantedAuthority&gt; authorities = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L90">        authorities.add(new SimpleGrantedAuthority(&quot;ROLE_&quot; + roleUser));</span>
+<span class="fc" id="L89">        List&lt;GrantedAuthority&gt; authorities = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L90">        authorities.add(new SimpleGrantedAuthority(&quot;ROLE_&quot; + roleUser));</span>
 
-<span class="nc" id="L92">        logger.info(&quot;Autorités assignées : {}&quot;, authorities);</span>
-<span class="nc" id="L93">        return authorities;</span>
+<span class="fc" id="L92">        logger.info(&quot;Autorités assignées : {}&quot;, authorities);</span>
+<span class="fc" id="L93">        return authorities;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

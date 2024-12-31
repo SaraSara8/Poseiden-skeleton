@@ -38,8 +38,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User findByUsername(String username) {
-<span class="nc" id="L41">        logger.info(&quot;Recherche de l'utilisateur avec le nom d'utilisateur : {}&quot;, username);</span>
-<span class="nc" id="L42">        return userRepository.findByUsername(username).orElse(null);</span>
+<span class="fc" id="L41">        logger.info(&quot;Recherche de l'utilisateur avec le nom d'utilisateur : {}&quot;, username);</span>
+<span class="fc" id="L42">        return userRepository.findByUsername(username).orElse(null);</span>
     }
 
 

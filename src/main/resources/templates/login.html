@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Login - Skeleton</title>
-  <link rel="stylesheet" href="../../css/bootstrap.min.css" >
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
   <style>
     /* Pour faire en sorte que la page prenne la hauteur complète du viewport */
     html, body {
@@ -31,7 +31,14 @@
 </head>
 <body>
 <div class="container-fluid full-height">
+
   <h1 class="mb-4">Skeleton</h1>
+
+  <!-- Affichage conditionnel d'un message d'erreur -->
+  <div th:if="${loginError != null}" class="alert alert-danger" role="alert" th:text="${loginError}">
+    <!-- Le texte sera injecté par le contrôleur en cas d'erreur -->
+  </div>
+
   <form class="login-form" th:action="@{/login}" method="post">
     <div class="mb-3">
       <label for="username" class="form-label">Nom d'utilisateur</label>

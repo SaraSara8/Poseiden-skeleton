@@ -60,8 +60,11 @@ public class SecurityConfig {
                         .anyRequest().authenticated() // Toutes les autres pages nécessitent une authentification
                 )
                 .formLogin(formLogin -> formLogin
-                        .loginPage("/login") // Page de connexion personnalisée
-                        .successHandler(customAuthenticationSuccessHandler()) // Gestionnaire de succès personnalisé
+                        .loginPage("/login")
+                        // Indiquer quel handler utiliser après une authentification réussie
+                        .successHandler(customAuthenticationSuccessHandler())
+                        // En cas d’échec (mauvais login / password), on renvoie vers /login?error=true
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> {
@@ -73,8 +76,8 @@ public class SecurityConfig {
                             .permitAll();
                 })
                 .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.accessDeniedPage("/error/403")
-                )
+                       exceptionHandling.accessDeniedPage("/error/403")
+               )
                 .userDetailsService(customUserDetailsService); // Utiliser le service utilisateur personnalisé
         logger.info("Configuration de la chaîne de filtres de sécurité terminée.");
         return http.build();

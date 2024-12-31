@@ -96,7 +96,7 @@ CREATE TABLE Users (
   PRIMARY KEY (Id)
 );
 
-insert into Users(fullname, username, password, role) values("Administrator", "admin", "$2a$10$79bTWepb.v2sKYrFrL5PT.UU90HwrplKfjBnF92bOUoLB6I94LgCS", "ADMIN");
+insert into Users(fullname, username, password, role) values("Administrator", "admin", "$2a$10$JRe604YPPx7Ewy6/PK.UCeEyiIDY13grNnzXFuKPVhK0VpFOyhkPG", "ADMIN");
 insert into Users(fullname, username, password, role) values("User", "user", "$2a$10$JRe604YPPx7Ewy6/PK.UCeEyiIDY13grNnzXFuKPVhK0VpFOyhkPG", "USER");
 
 commit;
